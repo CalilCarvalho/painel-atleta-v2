@@ -271,7 +271,10 @@
           im.src = src;
         });
       },
-    }));
+    });
+
+    Alpine.data('athleteDashboard', __athleteDashboardFactory);
+    window.athleteDashboard = __athleteDashboardFactory;
 
     // se Alpine já tiver iniciado, assegura que a árvore é montada
     try { if (window.Alpine && Alpine.initialized) Alpine.initTree(document.body); } catch(e){}
