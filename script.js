@@ -1,3 +1,9 @@
+
+(function(){
+  function registerComponent(){
+    // Evita registrar duas vezes
+    if (window.__athleteDashboardRegistered) return;
+    window.__athleteDashboardRegistered = true;
 // Painel DPO Atleta — Alpine.js component com drag/resize + export PNG
 document.addEventListener('alpine:init', () => {
   Alpine.data('athleteDashboard', () => ({
@@ -311,3 +317,18 @@ document.addEventListener('alpine:init', () => {
     },
   }));
 });
+
+    // Se Alpine já tiver iniciado, re-inicializamos a árvore para montar o componente
+    try { if (window.Alpine && Alpine.initialized) Alpine.initTree(document.body); } catch(e){}
+  }
+
+  if (window.Alpine) {
+    // Alpine já está carregado (ou carregará o DOM em instantes)
+    registerComponent();
+    // Garante também no 'alpine:init' se ainda não tiver inicializado a DOM
+    document.addEventListener('alpine:init', registerComponent, { once:true });
+  } else {
+    // Alpine ainda não carregou: registra no momento do 'alpine:init'
+    document.addEventListener('alpine:init', registerComponent, { once:true });
+  }
+})();
