@@ -2,22 +2,94 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Teste de Conexão - Petite-Vue</title>
-    <script src="https://unpkg.com/petite-vue" defer init></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Atleta - v2</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <script src="https://unpkg.com/petite-vue" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="script.js" defer></script>
-    <style>
-        body { font-family: sans-serif; background-color: #333; color: white; padding: 20px; }
-        h2 { color: #42b883; /* A cor do Vue.js, para sabermos que é diferente */ font-size: 2rem; }
-    </style>
 </head>
 
-<body v-scope>
+<body v-scope x-cloak>
+    <div class="dashboard-container">
+        <aside id="photo-editor-sidebar" class="card fade-in">
+             <h2>Sua Foto de Conquista</h2>
+            <div id="preview-container">
+                <img id="background-photo" :src="photoSrc" v-show="photoSrc">
+                
+                <div id="data-block" v-show="photoSrc" 
+                    :style="{ transform: `translate(${dataBlock.x}px, ${dataBlock.y}px)`, width: `${dataBlock.width}px`, height: `${dataBlock.height}px` }" 
+                    @mousedown.prevent="dragStart" @touchstart.prevent="dragStart">
+                    
+                    <h3 v-text="lastRaceData.nome"></h3>
+                    <div class="stats">
+                        <div class="stat-item"><i class="fa-solid fa-road"></i><div><span class="label">Distância</span><span class="value" v-text="lastRaceData.distancia"></span></div></div>
+                        <div class="stat-item"><i class="fa-solid fa-stopwatch"></i><div><span class="label">Tempo</span><span class="value" v-text="lastRaceData.tempo"></span></div></div>
+                        <div class="stat-item"><i class="fa-solid fa-person-running"></i><div><span class="label">Pace</span><span class="value" v-text="lastRaceData.pace"></span></div></div>
+                        <div class="stat-item"><i class="fa-solid fa-mountain"></i><div><span class="label">Elevação</span><span class="value" v-text="lastRaceData.elevacao"></span></div></div>
+                    </div>
+                    <div id="resize-handle" @mousedown.stop.prevent="resizeStart" @touchstart.stop.prevent="resizeStart"></div>
+                </div>
+            </div>
 
-    <h1>Teste de Conexão do Protótipo (com Petite-Vue)</h1>
-    <p>Se você vir a mensagem "Funcionou!" em verde abaixo, a base está correta.</p>
-    <hr>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="photo-upload" class="button">1. Enviar Foto</label>
+                    <input type="file" id="photo-upload" @change="handleFileUpload($event)" accept="image/*" style="display: none;">
+                </div>
+                <div class="control-group">
+                    <button @click="downloadImage" class="button primary-button"><i class="fa-solid fa-download"></i> Baixar Imagem</button>
+                </div>
+            </div>
+        </aside>
 
-    <h2 v-text="message">Carregando...</h2>
-
+        <main class="dashboard-content">
+            <section id="personal-highlight" class="card fade-in">
+                <h1 v-text="`Olá, ${athleteName}!`"></h1>
+            </section>
+ 
+             <section id="stats-summary" class="fade-in">
+                <div class="summary-card card">
+                    <div class="title">Pontos</div><div class="value" v-text="summary.totalPoints"></div>
+                </div>
+                <div class="summary-card card">
+                    <div class="title">Recorde</div><div class="value" v-text="summary.record.tempo"></div>
+                </div>
+                <div class="summary-card card">
+                    <div class="title">Provas</div><div class="value" v-text="summary.totalRaces"></div>
+                </div>
+             </section>
+ 
+             <section id="performance-chart" class="card fade-in">
+                 <h2>Evolução de Performance</h2>
+                 <div class="chart-container">
+                     <canvas id="evolutionChart"></canvas>
+                 </div>
+             </section>
+ 
+             <section id="history-table" class="card fade-in">
+                 <h2>Histórico de Provas</h2>
+                 <div class="table-wrapper">
+                     <table>
+                         <thead> <tr> <th>Data</th> <th>Prova</th> <th>Tempo</th> <th>Pos. Geral</th> <th>Pos. Cat.</th> <th>Pontos</th> </tr> </thead>
+                         <tbody>
+                            <template v-for="race in raceHistory" :key="race.data">
+                                <tr>
+                                    <td v-text="new Date(race.data).toLocaleDateString('pt-BR', {timeZone: 'UTC'})"></td>
+                                    <td v-text="race.prova"></td>
+                                    <td><strong v-text="race.tempo"></strong></td>
+                                    <td v-text="`${race.posGeral}º`"></td>
+                                    <td v-text="`${race.posCat}º`"></td>
+                                    <td v-text="race.pontos"></td>
+                                </tr>
+                            </template>
+                         </tbody>
+                     </table>
+                 </div>
+             </section>
+        </main>
+    </div>
 </body>
 </html>
