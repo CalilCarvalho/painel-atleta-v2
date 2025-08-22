@@ -64,7 +64,7 @@ body {
 
 #data-block {
     position: absolute;
-    background-color: rgba(0, 0, 0, 0.65);
+    background-color: rgba(250, 250, 250, 0.80);
     backdrop-filter: blur(5px);
     color: white;
     padding: 10px 15px;
