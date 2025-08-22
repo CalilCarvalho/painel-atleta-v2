@@ -14,7 +14,7 @@
     if (window.__athleteDashboardRegistered) return;
     window.__athleteDashboardRegistered = true;
 
-    Alpine.data('athleteDashboard', () => ({
+    const __athleteDashboardFactory = () => ({
       // ======= Estado =======
       athleteName: 'Atleta',
       raceHistory: [],
