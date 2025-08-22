@@ -13,14 +13,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 </head>
 
-<body v-scope="athleteDashboard()" v-cloak>
+<body v-scope="athleteDashboard()" x-init="init()" v-cloak>
     <div class="dashboard-container">
         <aside id="photo-editor-sidebar" class="card fade-in">
-            <h2>Sua Foto de Conquista</h2>
+             <h2>Sua Foto de Conquista</h2>
             <div id="preview-container">
                 <img id="background-photo" :src="photoSrc" v-show="photoSrc">
                 
-                <div id="data-block" v-show="photoSrc" 
+                <div id="data-block" v-show="true" 
                     :style="{ transform: `translate(${dataBlock.x}px, ${dataBlock.y}px)`, width: `${dataBlock.width}px`, height: `${dataBlock.height}px` }" 
                     @mousedown.prevent="dragStart" @touchstart.prevent="dragStart">
                     
@@ -37,7 +37,7 @@
 
             <div class="controls">
                 <div class="control-group">
-                    <label for="photo-upload" class="button">1. Enviar Foto</label>
+                    <label for="photo-upload" class="button">Enviar Foto</label>
                     <input type="file" id="photo-upload" @change="handleFileUpload($event)" accept="image/*" style="display: none;">
                 </div>
                  <div class="control-group">
@@ -76,7 +76,7 @@
              <section id="performance-chart" class="card fade-in">
                  <h2>Evolução de Performance</h2>
                  <div class="chart-container">
-                     <canvas id="evolutionChart" ref="chartCanvas"></canvas>
+                     <canvas id="evolutionChart" x-ref="chartCanvas"></canvas>
                  </div>
              </section>
  

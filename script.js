@@ -100,6 +100,7 @@ function athleteDashboard() {
     },
 
     initChart() {
+        // ✅ CORREÇÃO: Acessando o canvas através da referência '$refs'
         const canvasElement = this.$refs.chartCanvas;
         if(!canvasElement) return;
         const timeToSeconds = (timeStr) => {
