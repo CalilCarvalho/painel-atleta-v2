@@ -4,13 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Painel de Performance do Atleta</title>
+  <link rel="icon" href="data:;base64,=">
   <link rel="stylesheet" href="style.css" />
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <!-- Chart.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <!-- App logic -->
-  <script defer src="script.js?v=2"></script>
+  <script defer src="script.js?v=3"></script>
 </head>
 
 <body class="app" x-data="athleteDashboard" x-init="init()">
@@ -41,9 +42,9 @@
       </div>
 
       <!-- Gráfico -->
-      <div class="card">
+      <div class="card" style="height:300px">
         <h3>Gráfico de Evolução</h3>
-        <canvas id="evolutionChart" width="600" height="260"></canvas>
+        <canvas id="evolutionChart"></canvas>
       </div>
 
       <!-- Tabela de histórico -->
