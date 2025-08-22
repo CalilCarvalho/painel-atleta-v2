@@ -2,21 +2,22 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Teste de Conexão - Alpine.js</title>
+    <title>Teste de Conexão - Petite-Vue</title>
+    <script src="https://unpkg.com/petite-vue" defer init></script>
+    <script src="script.js" defer></script>
     <style>
         body { font-family: sans-serif; background-color: #333; color: white; padding: 20px; }
-        h2 { color: #1DB954; font-size: 2rem; }
+        h2 { color: #42b883; /* A cor do Vue.js, para sabermos que é diferente */ font-size: 2rem; }
     </style>
 </head>
 
-<body x-data="testComponent">
+<body v-scope>
 
-    <h1>Teste de Conexão do Protótipo</h1>
-    <p>Se você vir a mensagem "Funcionou!" em verde abaixo, significa que a base está correta.</p>
+    <h1>Teste de Conexão do Protótipo (com Petite-Vue)</h1>
+    <p>Se você vir a mensagem "Funcionou!" em verde abaixo, a base está correta.</p>
     <hr>
 
-    <h2 x-text="message">Carregando...</h2>
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <script src="script.js" defer></script>
+    <h2 v-text="message">Carregando...</h2>
+
 </body>
 </html>
