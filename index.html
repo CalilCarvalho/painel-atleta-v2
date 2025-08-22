@@ -1,106 +1,156 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Atleta - Funcional</title>
-    
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-    <script src="script.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Painel de Performance do Atleta</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- Chart.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- App logic -->
+  <script defer src="script.js"></script>
 </head>
 
-<body x-data="athleteDashboard" x-init="init()" x-cloak>
-    <div class="dashboard-container">
-        <aside id="photo-editor-sidebar" class="card fade-in">
-             <h2>Sua Foto de Conquista</h2>
-            <div id="preview-container" x-ref="previewContainer">
-                <img id="background-photo" :src="photoSrc" x-show="photoSrc">
-                
-                <div id="data-block" x-show="photoSrc" x-ref="dataBlock"
-                    :style="`transform: translate(${dataBlock.x}px, ${dataBlock.y}px); width: ${dataBlock.width}px; height: ${dataBlock.height}px;`" 
-                    @mousedown.prevent="dragStart" @touchstart.prevent="dragStart">
-                    
-                    <h3 x-text="lastRaceData.nome"></h3>
-                    <div class="stats">
-                        <div class="stat-item"><i class="fa-solid fa-road"></i><div><span class="label">Distância</span><span class="value" x-text="lastRaceData.distancia"></span></div></div>
-                        <div class="stat-item"><i class="fa-solid fa-stopwatch"></i><div><span class="label">Tempo</span><span class="value" x-text="lastRaceData.tempo"></span></div></div>
-                        <div class="stat-item"><i class="fa-solid fa-person-running"></i><div><span class="label">Pace</span><span class="value" x-text="lastRaceData.pace"></span></div></div>
-                        <div class="stat-item"><i class="fa-solid fa-mountain"></i><div><span class="label">Elevação</span><span class="value" x-text="lastRaceData.elevacao"></span></div></div>
-                    </div>
-                    <div id="resize-handle" x-ref="resizeHandle" @mousedown.stop.prevent="resizeStart" @touchstart.stop.prevent="resizeStart"></div>
-                </div>
-            </div>
+<body class="app" x-data="athleteDashboard" x-init="init()">
+  <header class="app__header">
+    <h1 class="app__title" x-text="`Painel do Atleta – ${athleteName}`">Painel do Atleta</h1>
+  </header>
 
-            <div class="controls">
-                <div class="control-group">
-                    <label for="photo-upload" class="button">1. Enviar Foto</label>
-                    <input type="file" id="photo-upload" @change="handleFileUpload($event)" accept="image/*" style="display: none;">
-                </div>
-                 <div class="control-group">
-                    <label class="sub-label">Posição da Logo</label>
-                    <div class="position-buttons logo-position">
-                        <button @click="logoPosition = 'top-left'" :class="{'active': logoPosition === 'top-left'}">↖</button>
-                        <button @click="logoPosition = 'top-right'" :class="{'active': logoPosition === 'top-right'}">↗</button>
-                        <button @click="logoPosition = 'bottom-left'" :class="{'active': logoPosition === 'bottom-left'}">↙</button>
-                        <button @click="logoPosition = 'bottom-right'" :class="{'active': logoPosition === 'bottom-right'}">↘</button>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <button @click="downloadImage" class="button primary-button"><i class="fa-solid fa-download"></i> Baixar Imagem</button>
-                </div>
-            </div>
-        </aside>
+  <main class="app__grid">
+    <!-- Painel de Performance (Conteúdo Principal) -->
+    <section class="panel">
+      <h2 class="panel__title" x-text="`Olá, ${athleteName}!`">Olá</h2>
 
-        <main class="dashboard-content">
-            <section id="personal-highlight" class="card fade-in">
-                <h1 x-text="`Olá, ${athleteName}!`"></h1>
-                <p class="subtitle-text">Bem-vindo ao seu painel de performance.</p>
-            </section>
- 
-             <section id="stats-summary" class="fade-in">
-                <div class="summary-card card">
-                    <div class="title">Pontos</div><div class="value" x-text="summary.totalPoints"></div>
-                </div>
-                <div class="summary-card card">
-                    <div class="title">Recorde</div><div class="value" x-text="summary.record.tempo"></div>
-                </div>
-                <div class="summary-card card">
-                    <div class="title">Provas</div><div class="value" x-text="summary.totalRaces"></div>
-                </div>
-             </section>
- 
-             <section id="performance-chart" class="card fade-in">
-                 <h2>Evolução de Performance</h2>
-                 <div class="chart-container">
-                     <canvas id="evolutionChart" x-ref="chartCanvas"></canvas>
-                 </div>
-             </section>
- 
-             <section id="history-table" class="card fade-in">
-                 <h2>Histórico de Provas</h2>
-                 <div class="table-wrapper">
-                     <table>
-                         <thead> <tr> <th>Data</th> <th>Prova</th> <th>Tempo</th> <th>Pos. Geral</th> <th>Pos. Cat.</th> <th>Pontos</th> </tr> </thead>
-                         <tbody>
-                            <template x-for="race in raceHistory" :key="race.data">
-                                <tr>
-                                    <td x-text="new Date(race.data).toLocaleDateString('pt-BR', {timeZone: 'UTC'})"></td>
-                                    <td x-text="race.prova"></td>
-                                    <td><strong x-text="race.tempo"></strong></td>
-                                    <td x-text="`${race.posGeral}º`"></td>
-                                    <td x-text="`${race.posCat}º`"></td>
-                                    <td x-text="race.pontos"></td>
-                                </tr>
-                            </template>
-                         </tbody>
-                     </table>
-                 </div>
-             </section>
-        </main>
-    </div>
+      <!-- KPIs -->
+      <div class="kpis">
+        <div class="kpi">
+          <div class="kpi__label">Total de Pontos</div>
+          <div class="kpi__value" x-text="summary.totalPoints">0</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi__label">Recorde Pessoal</div>
+          <div class="kpi__value" x-text="summary.record.timeLabel">--:--</div>
+          <div class="kpi__sub" x-text="summary.record.raceLabel"></div>
+        </div>
+        <div class="kpi">
+          <div class="kpi__label">Provas Concluídas</div>
+          <div class="kpi__value" x-text="summary.totalRaces">0</div>
+        </div>
+      </div>
+
+      <!-- Gráfico -->
+      <div class="card">
+        <h3>Gráfico de Evolução</h3>
+        <canvas id="evolutionChart" width="600" height="260"></canvas>
+      </div>
+
+      <!-- Tabela de histórico -->
+      <div class="card">
+        <h3>Histórico de Corridas</h3>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Prova</th>
+                <th>Tempo</th>
+                <th>Posição Geral</th>
+                <th>Posição Categoria</th>
+                <th>Pontos</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="(r, idx) in raceHistory" :key="idx">
+                <tr>
+                  <td x-text="r.dateStr"></td>
+                  <td x-text="r.race"></td>
+                  <td x-text="r.timeLabel"></td>
+                  <td x-text="r.posOverall"></td>
+                  <td x-text="r.posCategory"></td>
+                  <td x-text="r.points"></td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Editor de Imagem de Conquista (Barra lateral) -->
+    <aside class="editor">
+      <h2 class="panel__title">Imagem de Conquista</h2>
+
+      <div class="card">
+        <label class="upload">
+          <input type="file" accept="image/*" @change="handleFileUpload($event)" />
+          <span>Enviar foto</span>
+        </label>
+      </div>
+
+      <!-- Prévia 9:16 -->
+      <div class="preview card" x-ref="preview" :class="{'preview--empty': !photoSrc}">
+        <img x-show="photoSrc" :src="photoSrc" alt="Foto do atleta" class="preview__img" />
+        <!-- bloco de dados arrastável e redimensionável -->
+        <div
+          x-show="photoSrc"
+          x-ref="dataBlock"
+          class="data-block"
+          :style="{
+            left: blockX + 'px',
+            top: blockY + 'px',
+            width: blockW + 'px',
+            height: blockH + 'px'
+          }"
+        >
+          <div class="data-block__drag-handle"
+               @pointerdown="startDrag($event)"
+               title="Arraste para mover"></div>
+
+          <div class="data-block__content">
+            <div class="db__title" x-text="lastRaceData.race"></div>
+            <div class="db__row">
+              <span>Data:</span><b x-text="lastRaceData.dateStr"></b>
+            </div>
+            <div class="db__row">
+              <span>Tempo:</span><b x-text="lastRaceData.timeLabel"></b>
+            </div>
+            <div class="db__row">
+              <span>Pontos:</span><b x-text="lastRaceData.points"></b>
+            </div>
+          </div>
+
+          <div class="data-block__resize-handle"
+               @pointerdown="startResize($event)"
+               title="Arraste para redimensionar"></div>
+        </div>
+
+        <!-- Logomarca apenas na exportação; aqui mostramos uma “ghost” de posição -->
+        <img x-show="photoSrc" src="logo.png" alt="Logo"
+             class="logo-ghost"
+             :style="logoGhostStyle" />
+      </div>
+
+      <div class="card">
+        <h3>Posição da logomarca</h3>
+        <div class="logo-controls">
+          <button class="btn" :class="{'active': logoPosition === 'top-left'}"    @click="logoPosition='top-left'">Topo/Esq.</button>
+          <button class="btn" :class="{'active': logoPosition === 'top-right'}"   @click="logoPosition='top-right'">Topo/Dir.</button>
+          <button class="btn" :class="{'active': logoPosition === 'bottom-left'}" @click="logoPosition='bottom-left'">Rodapé/Esq.</button>
+          <button class="btn" :class="{'active': logoPosition === 'bottom-right'}"@click="logoPosition='bottom-right'">Rodapé/Dir.</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <button class="btn btn--primary" @click="exportImage()">Baixar Imagem</button>
+        <button class="btn" @click="resetBlock()">Resetar bloco</button>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="app__footer">
+    <small>© 2025 Painel DPO Atleta</small>
+  </footer>
 </body>
 </html>
