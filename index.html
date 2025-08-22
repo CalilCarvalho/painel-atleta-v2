@@ -3,103 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Atleta - Funcional</title>
-    
+    <title>Painel do Atleta - Protótipo</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
-    <script src="script.js" defer></script>
-    <script src="https://unpkg.com/petite-vue" defer init></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="script.js" defer></script>
 </head>
-
-<body v-scope="athleteDashboard()" x-init="init()" v-cloak>
+<body>
     <div class="dashboard-container">
         <aside id="photo-editor-sidebar" class="card fade-in">
-             <h2>Sua Foto de Conquista</h2>
+            <h2>Sua Foto de Conquista</h2>
             <div id="preview-container">
-                <img id="background-photo" :src="photoSrc" v-show="photoSrc">
-                
-                <div id="data-block" v-show="true" 
-                    :style="{ transform: `translate(${dataBlock.x}px, ${dataBlock.y}px)`, width: `${dataBlock.width}px`, height: `${dataBlock.height}px` }" 
-                    @mousedown.prevent="dragStart" @touchstart.prevent="dragStart">
-                    
-                    <h3 v-text="lastRaceData.nome"></h3>
+                <img id="background-photo" src="" alt="Sua foto aparecerá aqui">
+                <div id="data-block" class="draggable">
+                    <h3 id="race-name"></h3>
                     <div class="stats">
-                        <div class="stat-item"><i class="fa-solid fa-road"></i><div><span class="label">Distância</span><span class="value" v-text="lastRaceData.distancia"></span></div></div>
-                        <div class="stat-item"><i class="fa-solid fa-stopwatch"></i><div><span class="label">Tempo</span><span class="value" v-text="lastRaceData.tempo"></span></div></div>
-                        <div class="stat-item"><i class="fa-solid fa-person-running"></i><div><span class="label">Pace</span><span class="value" v-text="lastRaceData.pace"></span></div></div>
-                        <div class="stat-item"><i class="fa-solid fa-mountain"></i><div><span class="label">Elevação</span><span class="value" v-text="lastRaceData.elevacao"></span></div></div>
+                        <div class="stat-item"><i class="fa-solid fa-road"></i><div><span class="label">Distância</span><span class="value" id="stat-distance"></span></div></div>
+                        <div class="stat-item"><i class="fa-solid fa-stopwatch"></i><div><span class="label">Tempo</span><span class="value" id="stat-time"></span></div></div>
+                        <div class="stat-item"><i class="fa-solid fa-person-running"></i><div><span class="label">Pace</span><span class="value" id="stat-pace"></span></div></div>
+                        <div class="stat-item"><i class="fa-solid fa-mountain"></i><div><span class="label">Elevação</span><span class="value" id="stat-elevation"></span></div></div>
                     </div>
-                    <div id="resize-handle" @mousedown.stop.prevent="resizeStart" @touchstart.stop.prevent="resizeStart"></div>
                 </div>
             </div>
-
             <div class="controls">
                 <div class="control-group">
-                    <label for="photo-upload" class="button">Enviar Foto</label>
-                    <input type="file" id="photo-upload" @change="handleFileUpload($event)" accept="image/*" style="display: none;">
+                    <label for="photo-upload" class="button small-button"><i class="fa-solid fa-upload"></i> Enviar Foto</label>
+                    <input type="file" id="photo-upload" accept="image/*" style="display: none;">
                 </div>
-                 <div class="control-group">
+                <div class="control-group">
                     <label class="sub-label">Posição da Logo</label>
                     <div class="position-buttons logo-position">
-                        <button @click="logoPosition = 'top-left'" :class="{'active': logoPosition === 'top-left'}">↖</button>
-                        <button @click="logoPosition = 'top-right'" :class="{'active': logoPosition === 'top-right'}">↗</button>
-                        <button @click="logoPosition = 'bottom-left'" :class="{'active': logoPosition === 'bottom-left'}">↙</button>
-                        <button @click="logoPosition = 'bottom-right'" :class="{'active': logoPosition === 'bottom-right'}">↘</button>
+                        <button data-position="top-left">↖</button>
+                        <button data-position="top-right" class="active">↗</button>
+                        <button data-position="bottom-left">↙</button>
+                        <button data-position="bottom-right">↘</button>
                     </div>
                 </div>
                 <div class="control-group">
-                    <button @click="downloadImage" class="button primary-button"><i class="fa-solid fa-download"></i> Baixar Imagem</button>
+                    <label class="sub-label">Posição dos Dados</label>
+                    <div class="position-buttons data-position">
+                        <button data-position="top-left">↖</button>
+                        <button data-position="top-right">↗</button>
+                        <button data-position="bottom-left" class="active">↙</button>
+                        <button data-position="bottom-right">↘</button>
+                    </div>
+                    <small>Arraste para ajustar!</small>
+                </div>
+                <div class="control-group">
+                    <button id="download-btn" class="button primary-button small-button"><i class="fa-solid fa-download"></i> Baixar Foto</button>
                 </div>
             </div>
         </aside>
-
         <main class="dashboard-content">
             <section id="personal-highlight" class="card fade-in">
-                <h1 v-text="`Olá, ${athleteName}!`"></h1>
+                <h1 id="welcome-message" style="margin-top:0;"></h1>
                 <p class="subtitle-text">Bem-vindo ao seu painel de performance. Acompanhe sua evolução e celebre suas conquistas.</p>
             </section>
- 
-             <section id="stats-summary" class="fade-in">
-                <div class="summary-card card">
-                    <div class="title">Pontos no Circuito</div><div class="value" v-text="summary.totalPoints"></div>
+
+            <section id="stats-summary" class="fade-in">
+                <div id="card-points" class="summary-card card"></div>
+                <div id="card-record" class="summary-card card"></div>
+                <div id="card-races" class="summary-card card"></div>
+            </section>
+
+            <section id="performance-chart" class="card fade-in">
+                <h2>Evolução de Performance (Tempo por Prova)</h2>
+                <div class="chart-container">
+                    <canvas id="evolutionChart"></canvas>
                 </div>
-                <div class="summary-card card">
-                    <div class="title">Recorde Pessoal</div><div class="value" v-text="summary.record.tempo"></div>
+            </section>
+
+            <section id="history-table" class="card fade-in">
+                <h2>Histórico de Provas</h2>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Prova</th>
+                                <th>Tempo Oficial</th>
+                                <th>Pos. Geral</th>
+                                <th>Pos. Categoria</th>
+                                <th>Pontos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="races-tbody"></tbody>
+                    </table>
                 </div>
-                <div class="summary-card card">
-                    <div class="title">Provas Concluídas</div><div class="value" v-text="summary.totalRaces"></div>
-                </div>
-             </section>
- 
-             <section id="performance-chart" class="card fade-in">
-                 <h2>Evolução de Performance</h2>
-                 <div class="chart-container">
-                     <canvas id="evolutionChart" x-ref="chartCanvas"></canvas>
-                 </div>
-             </section>
- 
-             <section id="history-table" class="card fade-in">
-                 <h2>Histórico de Provas</h2>
-                 <div class="table-wrapper">
-                     <table>
-                         <thead> <tr> <th>Data</th> <th>Prova</th> <th>Tempo</th> <th>Pos. Geral</th> <th>Pos. Cat.</th> <th>Pontos</th> </tr> </thead>
-                         <tbody>
-                            <template v-for="race in raceHistory" :key="race.data">
-                                <tr>
-                                    <td v-text="new Date(race.data).toLocaleDateString('pt-BR', {timeZone: 'UTC'})"></td>
-                                    <td v-text="race.prova"></td>
-                                    <td><strong v-text="race.tempo"></strong></td>
-                                    <td v-text="`${race.posGeral}º`"></td>
-                                    <td v-text="`${race.posCat}º`"></td>
-                                    <td v-text="race.pontos"></td>
-                                </tr>
-                            </template>
-                         </tbody>
-                     </table>
-                 </div>
-             </section>
+            </section>
         </main>
     </div>
 </body>
