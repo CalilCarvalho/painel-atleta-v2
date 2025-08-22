@@ -13,14 +13,14 @@
     <script src="script.js" defer></script>
 </head>
 
-<body x-data="athleteDashboard()" x-init="init()" x-cloak>
+<body x-data="athleteDashboard" x-init="init()" x-cloak>
     <div class="dashboard-container">
         <aside id="photo-editor-sidebar" class="card fade-in">
              <h2>Sua Foto de Conquista</h2>
-            <div id="preview-container">
+            <div id="preview-container" x-ref="previewContainer">
                 <img id="background-photo" :src="photoSrc" x-show="photoSrc">
                 
-                <div id="data-block" x-show="photoSrc" 
+                <div id="data-block" x-show="photoSrc" x-ref="dataBlock"
                     :style="`transform: translate(${dataBlock.x}px, ${dataBlock.y}px); width: ${dataBlock.width}px; height: ${dataBlock.height}px;`" 
                     @mousedown.prevent="dragStart" @touchstart.prevent="dragStart">
                     
@@ -31,7 +31,7 @@
                         <div class="stat-item"><i class="fa-solid fa-person-running"></i><div><span class="label">Pace</span><span class="value" x-text="lastRaceData.pace"></span></div></div>
                         <div class="stat-item"><i class="fa-solid fa-mountain"></i><div><span class="label">Elevação</span><span class="value" x-text="lastRaceData.elevacao"></span></div></div>
                     </div>
-                    <div id="resize-handle" @mousedown.stop.prevent="resizeStart" @touchstart.stop.prevent="resizeStart"></div>
+                    <div id="resize-handle" x-ref="resizeHandle" @mousedown.stop.prevent="resizeStart" @touchstart.stop.prevent="resizeStart"></div>
                 </div>
             </div>
 

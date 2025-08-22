@@ -38,13 +38,16 @@ document.addEventListener('alpine:init', () => {
             };
         },
 
-        // --- MÉTODOS (Ações) ---
+        // --- MÉTODOS ---
         init() {
             this.initChart();
-            window.addEventListener('mousemove', (e) => { this.dragMove(e); this.resizeMove(e); });
-            window.addEventListener('mouseup', () => { this.dragEnd(); this.resizeEnd(); });
-            window.addEventListener('touchmove', (e) => { this.dragMove(e); this.resizeMove(e); }, { passive: false });
-            window.addEventListener('touchend', () => { this.dragEnd(); this.resizeEnd(); });
+            const moveHandler = (e) => { this.dragMove(e); this.resizeMove(e); };
+            const endHandler = () => { this.dragEnd(); this.resizeEnd(); };
+            
+            window.addEventListener('mousemove', moveHandler);
+            window.addEventListener('mouseup', endHandler);
+            window.addEventListener('touchmove', moveHandler, { passive: false });
+            window.addEventListener('touchend', endHandler);
         },
         
         handleFileUpload(event) {
@@ -55,7 +58,7 @@ document.addEventListener('alpine:init', () => {
         },
         
         dragStart(event) {
-            if (event.target.id === 'resize-handle') return;
+            if (event.target === this.$refs.resizeHandle) return;
             this.dragging = {
                 startX: (event.touches ? event.touches[0].clientX : event.clientX) - this.dataBlock.x,
                 startY: (event.touches ? event.touches[0].clientY : event.clientY) - this.dataBlock.y,
